@@ -1,5 +1,5 @@
 // 全局变量
-let selectedAPIs = JSON.parse(localStorage.getItem('selectedAPIs') || '["tyyszy","dyttzy", "bfzy", "ruyi"); // 默认选中天涯资源、暴风资源和如意资源
+let selectedAPIs = JSON.parse(localStorage.getItem('selectedAPIs') || '["tyyszy","dyttzy", "bfzy", "ruyi"]'); // 默认选中天涯资源、暴风资源和如意资源
 let customAPIs = JSON.parse(localStorage.getItem('customAPIs') || '[]'); // 存储自定义API列表
 
 // 添加当前播放的集数索引
@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // 设置默认API选择（如果是第一次加载）
     if (!localStorage.getItem('hasInitializedDefaults')) {
         // 仅选择天涯资源、暴风资源和如意资源
-        selectedAPIs = ["tyyszy","dyttzy", "bfzy", "ruyi"];
+        selectedAPIs = ["tyyszy","bfzy","dyttzy", "ruyi"];
         localStorage.setItem('selectedAPIs', JSON.stringify(selectedAPIs));
         
         // 默认选中过滤开关
@@ -568,11 +568,11 @@ function resetSearchArea() {
     try {
         window.history.pushState(
             {}, 
-            `小生聚合TV - 免费在线视频搜索与观看平台`, 
+            `LibreTV - 免费在线视频搜索与观看平台`, 
             `/`
         );
         // 更新页面标题
-        document.title = `小生聚合TV - 免费在线视频搜索与观看平台`;
+        document.title = `LibreTV - 免费在线视频搜索与观看平台`;
     } catch (e) {
         console.error('更新浏览器历史失败:', e);
     }
@@ -786,11 +786,11 @@ async function search() {
             // 使用HTML5 History API更新URL，不刷新页面
             window.history.pushState(
                 { search: query }, 
-                `搜索: ${query} - 小生聚合TV`, 
+                `搜索: ${query} - LibreTV`, 
                 `/s=${encodedQuery}`
             );
             // 更新页面标题
-            document.title = `搜索: ${query} - 小生聚合TV`;
+            document.title = `搜索: ${query} - LibreTV`;
         } catch (e) {
             console.error('更新浏览器历史失败:', e);
             // 如果更新URL失败，继续执行搜索
@@ -1050,8 +1050,14 @@ function playVideo(url, vod_name, sourceCode, episodeIndex = 0) {
 
 // 弹出播放器页面
 function showVideoPlayer(url) {
-    // 临时隐藏搜索结果，防止高度超出播放器而出现滚动条
+    // 在打开播放器前，隐藏详情弹窗
+    const detailModal = document.getElementById('modal');
+    if (detailModal) {
+        detailModal.classList.add('hidden');
+    }
+    // 临时隐藏搜索结果和豆瓣区域，防止高度超出播放器而出现滚动条
     document.getElementById('resultsArea').classList.add('hidden');
+    document.getElementById('doubanArea').classList.add('hidden');
     // 在框架中打开播放页面
     videoPlayerFrame = document.createElement('iframe');
     videoPlayerFrame.id = 'VideoPlayerFrame';
@@ -1065,7 +1071,17 @@ function closeVideoPlayer() {
     videoPlayerFrame = document.getElementById('VideoPlayerFrame');
     if (videoPlayerFrame) {
         videoPlayerFrame.remove();
+        // 恢复搜索结果显示
         document.getElementById('resultsArea').classList.remove('hidden');
+        // 关闭播放器时也隐藏详情弹窗
+        const detailModal = document.getElementById('modal');
+        if (detailModal) {
+            detailModal.classList.add('hidden');
+        }
+        // 如果启用豆瓣区域则显示豆瓣区域
+        if (localStorage.getItem('doubanEnabled') === 'true') {
+            document.getElementById('doubanArea').classList.remove('hidden');
+        }
     }
 }
 
@@ -1219,7 +1235,7 @@ async function importConfigFromUrl() {
             }
 
             const config = await response.json();
-            if (config.name !== '小生聚合TV-Settings') throw '配置文件格式不正确';
+            if (config.name !== 'LibreTV-Settings') throw '配置文件格式不正确';
 
             // 验证哈希
             const dataHash = await sha256(JSON.stringify(config.data));
@@ -1271,7 +1287,7 @@ async function importConfig() {
 
             // 解析并验证配置
             const config = JSON.parse(content);
-            if (config.name !== '小生聚合TV-Settings') throw '配置文件格式不正确';
+            if (config.name !== 'LibreTV-Settings') throw '配置文件格式不正确';
 
             // 验证哈希
             const dataHash = await sha256(JSON.stringify(config.data));
@@ -1355,7 +1371,7 @@ async function importConfigFromUrl() {
             if (!response.ok) throw '获取配置文件失败';
 
             const config = await response.json();
-            if (config.name !== '小生聚合TV-Settings') throw '配置文件格式不正确';
+            if (config.name !== 'LibreTV-Settings') throw '配置文件格式不正确';
 
             // 验证哈希
             const dataHash = await sha256(JSON.stringify(config.data));
@@ -1422,14 +1438,14 @@ async function exportConfig() {
     }
 
     const times = Date.now().toString();
-    config['name'] = '小生聚合TV-Settings';  // 配置文件名，用于校验
+    config['name'] = 'LibreTV-Settings';  // 配置文件名，用于校验
     config['time'] = times;               // 配置文件生成时间
     config['cfgVer'] = '1.0.0';           // 配置文件版本
     config['data'] = items;               // 配置文件数据
     config['hash'] = await sha256(JSON.stringify(config['data']));  // 计算数据的哈希值，用于校验
 
     // 将配置数据保存为 JSON 文件
-    saveStringAsFile(JSON.stringify(config), '小生聚合TV-Settings_' + times + '.json');
+    saveStringAsFile(JSON.stringify(config), 'LibreTV-Settings_' + times + '.json');
 }
 
 // 将字符串保存为文件
