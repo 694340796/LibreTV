@@ -170,7 +170,7 @@ input:checked + .slider:before {
 #resourceInfoBarContainer {
     align-items: center;
     border-radius: 0.5rem;
-    background-color: #191919;
+    background-color: #222222;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
