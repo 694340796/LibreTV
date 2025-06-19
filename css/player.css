@@ -301,13 +301,13 @@ input:checked + .slider:before {
 
 .player-container:-webkit-full-screen #player,
 .player-container:fullscreen #player {
+    background-color: #323232;
     width: 100%; height: 100%;
 }
 
 /* 资源信息卡片区 */
 #resourceInfoBarContainer {
     align-items: center;
-    background-color: #323232;
     border-radius: 0.5rem;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
